@@ -8,20 +8,55 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useMutation } from "convex/react";
 import { Trash2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { api } from "../../../../convex/_generated/api";
+import { Doc } from "../../../../convex/_generated/dataModel";
 
-export function NotePreviewDialog() {
+interface NotePreviewDialogProps {
+  note: Doc<"notes">;
+}
+export function NotePreviewDialog({note}: NotePreviewDialogProps) {
+
+  const searchParams = useSearchParams();
+  const isOpen = searchParams.get("noteId") === note._id;
+
+  const deleteNote = useMutation(api.notes.deleteUserNote);
+  const [deletePending, setDeletePending] = useState(false);
+  
+  async function handleDelete() {
+    setDeletePending(true);
+    try {
+      await deleteNote({ noteId: note._id });
+      toast.success("Note deleted");
+      handleCloseNote();
+    } catch (error) {
+      console.error("Failed to delete note", error);
+      toast.error("Failed to delete note. Please try again.");
+    } finally {
+      setDeletePending(false);
+    }
+  }
+
+  function handleCloseNote() {
+    if (deletePending) return;
+    window.history.pushState(null, "", window.location.pathname);
+  }
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={handleCloseNote}>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle>Note Title</DialogTitle>
+          <DialogTitle>{note.title}</DialogTitle>
         </DialogHeader>
-        <div className="mt-4 whitespace-pre-wrap">Note Body</div>
+        <div className="mt-4 whitespace-pre-wrap">{note.body}</div>
         <DialogFooter className="mt-6">
-          <Button variant="destructive" className="gap-2">
+          <Button variant="destructive" className="gap-2" onClick={handleDelete} disabled={deletePending}>
             <Trash2 size={16} />
-            Delete Note
+            {deletePending ? "Deleting..." : "Delete Note"}
           </Button>
         </DialogFooter>
       </DialogContent>
