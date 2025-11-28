@@ -24,7 +24,7 @@ export function NotePreviewDialog({note}: NotePreviewDialogProps) {
   const searchParams = useSearchParams();
   const isOpen = searchParams.get("noteId") === note._id;
 
-  const deleteNote = useMutation(api.notes.deleteUserNote);
+  const deleteNote = useMutation(api.notes.deleteNote);
   const [deletePending, setDeletePending] = useState(false);
   
   async function handleDelete() {
