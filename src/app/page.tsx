@@ -42,7 +42,7 @@ export default function Home() {
       <footer className="mt-auto pt-16 pb-8">
         <div className="text-center">
           <a
-            href="https://github.com/sarvbesh"
+            href="https://github.com/atsarvesh"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
